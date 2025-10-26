@@ -1,5 +1,5 @@
-from pydantic import BaseModel
+from beanie import Document
 
-class Configuration(BaseModel):
+class Configuration(Document):
     # Radio Station Name
     name: str
