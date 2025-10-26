@@ -1,0 +1,43 @@
+<icecast>
+    <!-- Network and server settings -->
+    <limits>
+        <clients>100</clients>           <!-- max number of listeners -->
+        <sources>2</sources>             <!-- max number of sources -->
+        <threadpool>5</threadpool>
+        <queue-size>524288</queue-size>
+        <client-timeout>30</client-timeout>
+        <header-timeout>15</header-timeout>
+        <source-timeout>10</source-timeout>
+    </limits>
+
+    <authentication>
+        <!-- Source password (used by your Python player) -->
+        <source-password>hackme</source-password>
+
+        <!-- Admin password (for web interface) -->
+        <admin-user>admin</admin-user>
+        <admin-password>admin</admin-password>
+    </authentication>
+
+    <hostname>0.0.0.0</hostname>
+    <listen-socket>
+        <port>8000</port>
+    </listen-socket>
+
+    <fileserve>1</fileserve>
+
+    <!-- Mount points -->
+    <mount>
+        <mount-name>/mystream</mount-name>
+        <max-listeners>100</max-listeners>
+        <public>1</public>
+    </mount>
+
+    <!-- Logging -->
+    <logging>
+        <accesslog>logs/access.log</accesslog>
+        <errorlog>logs/error.log</errorlog>
+        <loglevel>3</loglevel>
+        <logsize>10000</logsize>
+    </logging>
+</icecast>
