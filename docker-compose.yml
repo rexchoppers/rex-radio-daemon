@@ -9,9 +9,25 @@ services:
       ICECAST_ADMIN_PASSWORD: admin
       ICECAST_RELAY_PASSWORD: relay
     restart: unless-stopped
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
   redis:
     image: redis:latest
     container_name: redis
     restart: always
     ports:
       - "6379:6379"
+
+volumes:
+  mongodb_data:
