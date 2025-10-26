@@ -3,10 +3,12 @@ import os
 
 import redis
 from beanie import init_beanie
-from flask import Flask
+from flask import Flask, request, jsonify
 from flask.cli import load_dotenv
+from pydantic import ValidationError
 from pymongo import AsyncMongoClient
 
+from api.requests.update_configuration_request import UpdateConfigurationRequest
 from logger import init_logger
 from models.configuration import Configuration
 
@@ -41,7 +43,6 @@ def run(host="0.0.0.0", port=5000):
     mongodb_uri = os.getenv("MONGO_URI", "")
 
     logger.info(f"🔌 Connecting to MongoDB")
-    logger.info(f"T {mongodb_uri}")
 
     async def init_mongo():
         global mongodb_client
@@ -50,10 +51,34 @@ def run(host="0.0.0.0", port=5000):
 
         await init_beanie(database=db, document_models=[Configuration])
 
-
-    # Initialize MongoDB before running Flask
     asyncio.run(init_mongo())
-
     logger.info("✅ Connected to MongoDB")
 
+    logger.info("🤖 Finished initializing API server")
+
+    logger.info("🚀 Application running")
     app.run(host=host, port=port)
+
+@app.route("/config", methods=["PATCH"])
+def update_configuration():
+    try:
+        # Expecting JSON to be an array of ConfigurationUpdate objects
+        req_list = request.get_json(force=True)
+        updates = [UpdateConfigurationRequest.parse_obj(item) for item in req_list]
+    except ValidationError as e:
+        return jsonify({"error": e.errors()}), 400
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+    async def apply_updates():
+        for update in updates:
+            config = await Configuration.find_one(Configuration.field == update.field)
+            if config:
+                await config.set({Configuration.value: update.value})
+            else:
+                await Configuration(field=update.field, value=update.value).insert()
+        return True
+
+    asyncio.run(apply_updates())
+
+    return jsonify({"status": "ok"})

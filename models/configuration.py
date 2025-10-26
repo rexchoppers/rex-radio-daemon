@@ -1,5 +1,5 @@
 from beanie import Document
 
 class Configuration(Document):
-    # Radio Station Name
-    name: str
+    field: str
+    value: str
