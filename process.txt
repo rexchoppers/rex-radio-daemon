@@ -1,0 +1,15 @@
+[ Scheduler Process ]
+   - Keeps a “playlist/schedule”
+   - Checks every few seconds
+   - Adds new tasks if needed
+   - Pushes tasks to queue
+
+[ Player Process ]
+   - Reads tasks from queue
+   - Plays songs / streams
+   - Handles overlays / AI voice
+
+
+1. Patch
+    - Name
+    - Description
