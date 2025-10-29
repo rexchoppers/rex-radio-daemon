@@ -6,6 +6,16 @@ from gpt4all import GPT4All
 from llama_cpp import Llama
 
 
+# 1. Get station information
+    # Name
+    # Description
+    # Genres
+# 2. Generate radio schedule
+
+
+
+
+
 def run():
     MODEL_PATH = "llms/phi-4-Q4_0.gguf"
     # os.makedirs("models", exist_ok=True)
