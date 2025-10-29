@@ -12,9 +12,22 @@ def run():
 
     llm = Llama(
         model_path=MODEL_PATH,
-        n_ctx=16000,
-        n_threads=4,  # adjust for your CPU cores
+        n_ctx=4096,
+        n_gpu_layers=-1,
+        n_threads=os.cpu_count(),
     )
+
+    prompt = (
+        "<|system|>\n"
+        f"You are a radio script generator.\n"
+        # f"Topic: {topic}. Style: {style}.\n"
+        "<|end|>\n"
+        "<|user|>\n<|assistant|>"
+    )
+
+    # Generate output
+    output = llm(prompt, max_tokens=256, stop=["<|end|>"])
+    print(output["choices"][0]["text"].strip())
 
 if __name__ == "__main__":
     run()
