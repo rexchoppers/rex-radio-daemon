@@ -1,17 +1,21 @@
 import os
 import asyncio
+import time
+from datetime import datetime
 from multiprocessing import Process
 from typing import Optional
 
+from TTS.api import TTS
 from beanie import init_beanie
 from dotenv import load_dotenv
+from elevenlabs import ElevenLabs
 from gpt4all import GPT4All
 from llama_cpp import Llama
 from pymongo import AsyncMongoClient
 
 from logger import init_logger
 from models.configuration import Configuration
-
+from radio_prompts import RadioPrompts
 
 # 1. Get station information
     # Name
@@ -53,9 +57,7 @@ async def run():
     station_genres = next((c.value for c in configuration if c.field == 'genres'), [])
 
     print(station_name)
-
-    # Search for information in the list of configuration
-    station_name = configuration
+    print(station_genres)
 
     llm = Llama(
         model_path=MODEL_PATH,
@@ -64,17 +66,34 @@ async def run():
         n_threads=os.cpu_count(),
     )
 
-    prompt = (
-        "<|system|>\n"
-        f"You are a radio script generator.\n"
-        # f"Topic: {topic}. Style: {style}.\n"
-        "<|end|>\n"
-        "<|user|>\n<|assistant|>"
+    radio_prompts = RadioPrompts(
+        station_name=station_name,
+        personality="friendly",
+        tone="upbeat"
     )
 
+
     # Generate output
-    # output = llm(prompt, max_tokens=256, stop=["<|end|>"])
-    # print(output["choices"][0]["text"].strip())
+    output = llm(radio_prompts.station_start_welcome_prompt(datetime.now().strftime("%-I:%M %p")), max_tokens=256, stop=["<|end|>"])
+    response = output["choices"][0]["text"].strip()
+
+    print(response)
+
+    # Generate voice using TTS
+    client = ElevenLabs(api_key=os.getenv("ELEVEN_LABS_API_KEY"))
+
+    audio = client.text_to_speech.convert(
+        text=response,
+        voice_id="nrD2uNU2IUYtedZegcGx",
+        model_id="eleven_multilingual_v2",
+        output_format="mp3_44100_128",
+    )
+
+    # Save it
+    with open("radio_intro.mp3", "wb") as f:
+        for chunk in audio:
+            f.write(chunk)
+
 
 if __name__ == "__main__":
     asyncio.run(run())
