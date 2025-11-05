@@ -31,11 +31,4 @@ class RadioPrompts:
         )
         return prompt
 
-    def transition_prompt(self, next_segment: str):
-        return (
-                self.base_system_prompt() +
-                "<|user|>\n"
-                f"Create a short transition line introducing the next segment: {next_segment}. "
-                "Keep it conversational and natural.\n"
-                "<|assistant|>"
-        )
+
